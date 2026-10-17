@@ -1,0 +1,80 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: 
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+permissions:
+  contents: read
+
+# This workflow will it will build an dtest the image include code quality and security scanning tools like 
+# Code Linting (e.g., Flake8), Secret Scanning (Optional), SAST (Static Application Security Testing(ignore "0.0.0.0" related errors)), Unit test case(pytest) and Container Image Vulnerability Scanning.
+
+jobs:
+  test-lint-sast:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+
+      - name: Install CI-only tools
+        run: python -m pip install --upgrade pip pytest flake8 bandit
+
+      - name: Unit tests
+        run: python -m pytest -q test/
+
+      - name: Flake8 lint
+        run: flake8 app/app.py test/test_case.py --max-line-length=100
+
+      - name: Bandit SAST
+        # B104 is skipped because binding to 0.0.0.0 is required inside the container.
+        run: bandit -r app test -s B104 -ll
+
+  secret-scan:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Gitleaks secret scan (optional security gate)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  image-build-and-scan:
+    if: github.event.pull_request.draft == false
+    needs:
+      - test-lint-sast
+      - secret-scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build test image
+        run: docker build --build-arg IMAGE_VARIANT=pr-${{ github.event.pull_request.number }} -t memory-app:pr .
+
+      - name: Scan image with Trivy
+        uses: aquasecurity/trivy-action@0.36.0
+        with:
+          image-ref: memory-app:pr
+          format: table
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"

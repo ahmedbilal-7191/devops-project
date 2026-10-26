@@ -5,6 +5,9 @@ RUN apt-get update \
     && apt-get upgrade -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
+RUN pip uninstall -y pip setuptools wheel || true
+
+
 ENV PYTHONDONTWRITEBYTECODE=1 \ 
     PYTHONUNBUFFERED=1
 

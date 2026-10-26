@@ -18,7 +18,7 @@ on:
 permissions:
   contents: read
 
-# This workflow will it will build an dtest the image include code quality and security scanning tools like 
+# This workflow will it will build an dtest the image include code quality and security scanning tools like  checking feature branch
 # Code Linting (e.g., Flake8), Secret Scanning (Optional), SAST (Static Application Security Testing(ignore "0.0.0.0" related errors)), Unit test case(pytest) and Container Image Vulnerability Scanning.
 
 jobs:

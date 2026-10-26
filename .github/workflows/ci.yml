@@ -86,20 +86,11 @@ jobs:
         run: docker build --pull --no-cache --build-arg PYTHON_VERSION=${{ matrix.python-version }} -t memory-app:python-${{ matrix.python-version }} .
 
       - name: Scan image with Trivy
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@0.36.0
         with:
           image-ref: memory-app:python-${{ matrix.python-version }}
-          format: json
-          output: trivy-report-${{ matrix.python-version }}.json
+          format: table
           vuln-type: os,library
           severity: HIGH,CRITICAL
           ignore-unfixed: true
           exit-code: "1"
-
-      - name: Upload Trivy report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-report-python-${{ matrix.python-version }}
-          path: trivy-report-${{ matrix.python-version }}.json
-          if-no-files-found: warn

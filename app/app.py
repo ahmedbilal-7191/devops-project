@@ -3,10 +3,14 @@ import logging
 import sys
 import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
+import os
+
+PORT = int(os.getenv("APP_PORT", "8080"))
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 
 # Configure logging to output to stdout
 logging.basicConfig(
-    level=logging.INFO, 
+    level=LOG_LEVEL, 
     format='%(asctime)s - %(levelname)s - %(message)s', 
     stream=sys.stdout
 )
@@ -28,8 +32,8 @@ class HealthCheckHandler(BaseHTTPRequestHandler):
         pass
 
 def run_server():
-    server = HTTPServer(('0.0.0.0', 8080), HealthCheckHandler)
-    logger.info("Starting HTTP server on port 8080 for health checks...")
+    server = HTTPServer(('0.0.0.0', PORT), HealthCheckHandler)
+    logger.info(f"Starting HTTP server on port {PORT} for health checks...")
     server.serve_forever()
 
 def main():

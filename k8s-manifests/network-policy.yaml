@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: memory-app-network-policy
+  namespace: memory-leak
+spec:
+  podSelector:
+    matchLabels:
+      app: memory-app
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: memory-leak
+      ports:
+        - protocol: TCP
+          port: 8080

@@ -86,14 +86,13 @@ jobs:
         run: docker build --pull --no-cache --build-arg PYTHON_VERSION=${{ matrix.python-version }} -t memory-app:python-${{ matrix.python-version }} .
 
       
-      - name: Inspect package metadata
+      - name: Inspect pip bundled dependencies
         run: |
           docker run --rm memory-app:python-${{ matrix.python-version }} \
-          python -c "import importlib.metadata as m; print([(p, [(d.version, str(d._path)) for d in m.distributions() if d.metadata.get('Name', '').lower() == p]) for p in ['setuptools', 'urllib3', 'msgpack']])"
+          python -c "import pip; print('pip version:', pip.__version__); print('pip location:', pip.__file__)"
 
           docker run --rm memory-app:python-${{ matrix.python-version }} \
-          sh -c 'find /usr/local/lib/python${{ matrix.python-version }}/site-packages -type f -name METADATA 2>/dev/null | grep -E "/(setuptools|urllib3|msgpack)-[^/]+\.dist-info/METADATA" || true'
-
+          sh -c 'find /usr/local/lib -path "*/pip/_vendor/bom.cdx.json" -o -path "*/pip/_vendor/*/METADATA"'
 
       - name: Scan image with Trivy
         uses: aquasecurity/trivy-action@v0.36.0

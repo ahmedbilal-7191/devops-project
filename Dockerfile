@@ -11,7 +11,9 @@ RUN apt-get update \
        libssl3 openssl \
     && rm -rf /var/lib/apt/lists/*
 
-RUN python -m pip install --no-cache-dir --upgrade "setuptools>=80.10.1"
+RUN python -m pip install --no-cache-dir --upgrade \
+    "setuptools>=78.1.1" \
+    "urllib3>=2.8.0"
 
 RUN groupadd -r --gid 10001 app && \
     useradd -r --uid 10001 --gid 10001 --no-create-home --shell /bin/false app

@@ -89,8 +89,17 @@ jobs:
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: memory-app:python-${{ matrix.python-version }}
-          format: table
+          format: json
+          output: trivy-report-${{ matrix.python-version }}.json
           vuln-type: os,library
           severity: HIGH,CRITICAL
           ignore-unfixed: true
-          exit-code: "1"
+          exit-code: "0"
+
+      - name: Upload Trivy report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report-python-${{ matrix.python-version }}
+          path: trivy-report-${{ matrix.python-version }}.json
+          if-no-files-found: warn

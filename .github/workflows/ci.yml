@@ -85,15 +85,6 @@ jobs:
       - name: Build test image
         run: docker build --pull --no-cache --build-arg PYTHON_VERSION=${{ matrix.python-version }} -t memory-app:python-${{ matrix.python-version }} .
 
-      
-      - name: Inspect pip bundled inventory
-        run: |
-          docker run --rm memory-app:python-${{ matrix.python-version }} \
-          python -c "import pathlib, pip; p=pathlib.Path(pip.__file__).parent; print('pip:', pip.__version__); print('inventory exists:', (p/'_vendor/bom.cdx.json').exists()); print('inventory:', p/'_vendor/bom.cdx.json')"
-
-          docker run --rm memory-app:python-${{ matrix.python-version }} \
-          sh -c 'find /usr/local/lib -path "*/pip/_vendor/bom.cdx.json" -print'
-
       - name: Scan image with Trivy
         uses: aquasecurity/trivy-action@v0.36.0
         with:

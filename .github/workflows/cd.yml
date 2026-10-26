@@ -49,7 +49,6 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # Optional: Pass the version to Dockerfile if needed
           build-args: |
             PYTHON_VERSION=${{ matrix.python-version }}
 

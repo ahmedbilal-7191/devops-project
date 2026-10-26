@@ -1,6 +1,12 @@
 ARG PYTHON_VERSION=3.13
 FROM python:${PYTHON_VERSION}-slim-bookworm
 
+RUN apt-get update \
+    && apt-get upgrade -y --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip uninstall -y pip setuptools wheel
+
+
 ENV PYTHONDONTWRITEBYTECODE=1 \ 
     PYTHONUNBUFFERED=1
 

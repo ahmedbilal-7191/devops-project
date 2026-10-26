@@ -18,7 +18,7 @@ on:
 permissions:
   contents: read
 
-# This workflow will it will build an dtest the image include code quality and security scanning tools like 
+# This workflow will it will build an dtest the image include code quality and security scanning tools like  checking feature branch
 # Code Linting (e.g., Flake8), Secret Scanning (Optional), SAST (Static Application Security Testing(ignore "0.0.0.0" related errors)), Unit test case(pytest) and Container Image Vulnerability Scanning.
 
 jobs:
@@ -39,7 +39,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: pip
 
       - name: Install CI-only tools
         run: python -m pip install --upgrade pip pytest flake8 bandit
@@ -84,10 +83,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build test image
-        run: docker build --build-arg PYTHON_VERSION=${{ matrix.python-version }} -t memory-app:python-${{ matrix.python-version }} .
+        run: docker build --pull --no-cache --build-arg PYTHON_VERSION=${{ matrix.python-version }} -t memory-app:python-${{ matrix.python-version }} .
 
       - name: Scan image with Trivy
-        uses: aquasecurity/trivy-action@0.36.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: memory-app:python-${{ matrix.python-version }}
           format: table

@@ -1,6 +1,6 @@
 name: Release Pipeline
 
-#here also add paths ignore for cd.yml to avoid triggering on changes to docs, readme, etc.
+# here also add paths ignore for cd.yml to avoid triggering on changes to docs, readme, etc.
 
 on:
   push:
@@ -47,6 +47,8 @@ jobs:
         with:
           context: .
           push: true
+          pull: true
+          no-cache: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |

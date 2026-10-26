@@ -85,6 +85,13 @@ jobs:
       - name: Build test image
         run: docker build --pull --no-cache --build-arg PYTHON_VERSION=${{ matrix.python-version }} -t memory-app:python-${{ matrix.python-version }} .
 
+      - name: Inspect package metadata
+        run: |
+          docker run --rm memory-app:python-${{ matrix.python-version }} \
+          python -c "import importlib.metadata as m; print([(p, [(d.version, str(d._path)) for d in m.distributions() if d.metadata['Name'].lower() == p]) for p in ['setuptools', 'urllib3', 'msgpack']])"
+          docker run --rm memory-app:python-${{ matrix.python-version }} \
+          sh -c 'find /usr/local/lib/python3.13/site-packages -type f -name METADATA | grep -E "/(setuptools|urllib3|msgpack)-[^/]+\.dist-info/METADATA"'
+
       - name: Scan image with Trivy
         uses: aquasecurity/trivy-action@v0.36.0
         with:

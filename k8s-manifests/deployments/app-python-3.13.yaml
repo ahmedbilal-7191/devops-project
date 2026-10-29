@@ -19,7 +19,7 @@ spec:
       automountServiceAccountToken: false
       initContainers:
         - name: validate-config
-          image: bilal7191/memory-app:python-3.13-99162f7
+          image: bilal7191/memory-app:python-3.13-sha-0d31b43
           command:
             - sh
             - -c
@@ -37,7 +37,7 @@ spec:
               readOnly: true
       containers:
         - name: memory-app
-          image: bilal7191/memory-app:python-3.13-99162f7
+          image: bilal7191/memory-app:python-3.13-sha-0d31b43
           ports:
             - name: http
               containerPort: 8080

@@ -9,6 +9,7 @@ on:
     paths-ignore:
       - 'k8s-manifests/**'
       - 'observability/**'
+      - 'argocd/**'
 
 permissions:
   contents: write

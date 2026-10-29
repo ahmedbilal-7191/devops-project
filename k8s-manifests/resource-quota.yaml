@@ -2,11 +2,11 @@ apiVersion: v1
 kind: ResourceQuota
 metadata:
   name: memory-app-quota
-  namespace: memory-leak
+  namespace: memory-app
 spec:
   hard:
     pods: "10"
     requests.cpu: "500m"
     requests.memory: "512Mi"
     limits.cpu: "2"
-    limits.memory: "1500Mi"
+    limits.memory: "1700Mi"

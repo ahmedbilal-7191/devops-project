@@ -8,6 +8,7 @@ on:
       - main
     paths-ignore:
       - 'k8s-manifests/**'
+      - 'observability/**'
 
 permissions:
   contents: write
@@ -81,7 +82,7 @@ jobs:
         run: |
           for version in 3.11 3.12 3.13; do
             file="k8s-manifests/deployments/app-python-${version}.yaml"
-            image="${DOCKERHUB_USERNAME}/memory-app:python-${version}-${MERGE_SHA}"
+            image="${DOCKERHUB_USERNAME}/memory-app:python-${version}-sha-${MERGE_SHA}"
             sed -i "s|^\([[:space:]]*image:\).*|\1 ${image}|" "$file"
           done
 

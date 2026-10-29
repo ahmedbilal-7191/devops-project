@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: memory-app-python-312 
-  namespace: memory-leak
+  namespace: memory-app
 spec:
   replicas: 1
   selector:
@@ -24,6 +24,13 @@ spec:
             - sh
             - -c
             - test -f /config/APP_PORT && test -f /config/LOG_LEVEL
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
           volumeMounts:
             - name: app-config
               mountPath: /config

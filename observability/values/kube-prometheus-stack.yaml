@@ -1,0 +1,20 @@
+alertmanager:
+  enabled: false          # no separate Alertmanager
+
+defaultRules:
+  create: false           # skip the default PrometheusRules, nothing would consume them
+
+grafana:
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+    alerts:
+      enabled: true
+      label: grafana_alert
+  envFromSecret: slack-webhook   # the manually created Secret
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      access: proxy
+      url: http://loki.monitoring.svc.cluster.local:3100

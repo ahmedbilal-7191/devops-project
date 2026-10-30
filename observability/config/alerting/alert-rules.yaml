@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-alert-rules
+  namespace: monitoring
+  labels:
+    grafana_alert: "1"
+data:
+  alert-rules.yaml: |
+    apiVersion: 1
+    groups:
+      - orgId: 1
+        name: memory-app-alerts
+        folder: Memory App
+        interval: 1m
+        rules:
+          - uid: pod-not-ready
+            title: Pod not ready
+            condition: C
+            for: 1m
+            noDataState: OK
+            execErrState: Error
+            labels:
+              severity: critical
+            annotations:
+              summary: "Pod {{ $labels.pod }} is not ready"
+            data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  refId: A
+                  instant: true
+                  expr: kube_pod_status_ready{namespace="<app-ns>",condition="false"} == 1
+              - refId: B
+                datasourceUid: __expr__
+                model:
+                  refId: B
+                  type: reduce
+                  expression: A
+                  reducer: last
+              - refId: C
+                datasourceUid: __expr__
+                model:
+                  refId: C
+                  type: threshold
+                  expression: B
+                  conditions:
+                    - evaluator:
+                        type: gt
+                        params: [0]
+
+          - uid: pod-oomkilled
+            title: Pod OOMKilled
+            condition: C
+            for: 0s
+            noDataState: OK
+            execErrState: Error
+            labels:
+              severity: critical
+            annotations:
+              summary: "Container {{ $labels.container }} in {{ $labels.pod }} was OOMKilled"
+            data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  refId: A
+                  instant: true
+                  expr: >-
+                    kube_pod_container_status_last_terminated_reason{namespace="<app-ns>",reason="OOMKilled"}
+                    * on(namespace,pod,container)
+                    increase(kube_pod_container_status_restarts_total{namespace="<app-ns>"}[5m]) > 0
+              - refId: B
+                datasourceUid: __expr__
+                model:
+                  refId: B
+                  type: reduce
+                  expression: A
+                  reducer: last
+              - refId: C
+                datasourceUid: __expr__
+                model:
+                  refId: C
+                  type: threshold
+                  expression: B
+                  conditions:
+                    - evaluator:
+                        type: gt
+                        params: [0]

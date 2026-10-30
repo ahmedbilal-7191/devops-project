@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-contact-points
+  namespace: monitoring
+  labels:
+    grafana_alert: "1"
+data:
+  contact-points.yaml: |
+    apiVersion: 1
+    contactPoints:
+      - orgId: 1
+        name: slack
+        receivers:
+          - uid: slack-receiver
+            type: slack
+            settings:
+              url: $__env{SLACK_WEBHOOK_URL}
+              title: '{{ .CommonLabels.alertname }}'
+              text: '{{ range .Alerts }}{{ .Annotations.summary }}{{ "\n" }}{{ end }}'
